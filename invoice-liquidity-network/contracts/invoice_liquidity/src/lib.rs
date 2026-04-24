@@ -658,3 +658,4 @@ mod tests_arithmetic;
 mod tests_security;
 mod tests_protocol_fee;
 mod tests_distribution;
+mod tests_storage;
