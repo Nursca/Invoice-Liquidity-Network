@@ -25,6 +25,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+issue.md
+pr.md
+fix.md
 # Build outputs
 dist/
 build/
