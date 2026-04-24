@@ -12,6 +12,7 @@ import {
   submitSignedTransaction,
 } from "../utils/soroban";
 import { formatUSDC, formatAddress, formatDate, calculateYield } from "../utils/format";
+import DueDateCountdown from "./DueDateCountdown";
 
 type Tab = "discovery" | "my-funded";
 type FundingStep = "approve" | "fund";
@@ -254,7 +255,13 @@ export default function LPDashboard() {
                       {(invoice.discount_rate / 100).toFixed(2)}%
                     </span>
                   </td>
-                  <td className="px-6 py-5 text-sm">{formatDate(invoice.due_date)}</td>
+                  <td className="px-6 py-5">
+                    {activeTab === "discovery" ? (
+                      <span className="text-sm text-on-surface-variant">{formatDate(invoice.due_date)}</span>
+                    ) : (
+                      <DueDateCountdown dueDate={invoice.due_date} />
+                    )}
+                  </td>
                   <td className="px-6 py-5 font-bold text-green-600">
                     {formatUSDC(calculateYield(invoice.amount, invoice.discount_rate))}
                   </td>
