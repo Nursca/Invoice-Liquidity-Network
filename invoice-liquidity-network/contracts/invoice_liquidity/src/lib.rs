@@ -704,3 +704,4 @@ mod tests_protocol_fee;
 mod tests_distribution;
 mod tests_storage;
 mod tests_auth;
+mod tests_mutation;
