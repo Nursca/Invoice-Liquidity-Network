@@ -18,6 +18,22 @@ pub struct InvoiceSubmitted {
     pub status: InvoiceStatus,
 }
 
+#[contractevent(topics = ["updated"])]
+#[derive(Clone, Debug, PartialEq)]
+pub struct InvoiceUpdated {
+    #[topic]
+    pub invoice_id: u64,
+    #[topic]
+    pub freelancer: Address,
+    #[topic]
+    pub payer: Address,
+    pub token: Address,
+    pub amount: i128,
+    pub due_date: u64,
+    pub discount_rate: u32,
+    pub status: InvoiceStatus,
+}
+
 #[contractevent(topics = ["funded"])]
 #[derive(Clone, Debug, PartialEq)]
 pub struct InvoiceFunded {

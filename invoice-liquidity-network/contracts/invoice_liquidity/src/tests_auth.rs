@@ -128,6 +128,16 @@ fn fund_invoice_args(t: &AuthTestEnv, invoice_id: u64) -> soroban_sdk::Vec<Val> 
     ]
 }
 
+fn update_invoice_args(t: &AuthTestEnv, invoice_id: u64) -> soroban_sdk::Vec<Val> {
+    vec![
+        &t.env,
+        invoice_id.into_val(&t.env),
+        INVOICE_AMOUNT.into_val(&t.env),
+        (due_date(t) + 1).into_val(&t.env),
+        DISCOUNT_RATE.into_val(&t.env),
+    ]
+}
+
 fn claim_default_args(t: &AuthTestEnv, invoice_id: u64) -> soroban_sdk::Vec<Val> {
     vec![
         &t.env,
@@ -149,6 +159,14 @@ fn invoke_fund_invoice(t: &AuthTestEnv, invoice_id: u64) -> HostResult<()> {
         &t.contract_id,
         &Symbol::new(&t.env, "fund_invoice"),
         fund_invoice_args(t, invoice_id),
+    )
+}
+
+fn invoke_update_invoice(t: &AuthTestEnv, invoice_id: u64) -> HostResult<()> {
+    t.env.try_invoke_contract(
+        &t.contract_id,
+        &Symbol::new(&t.env, "update_invoice"),
+        update_invoice_args(t, invoice_id),
     )
 }
 
@@ -222,6 +240,18 @@ fn set_fund_invoice_auth(
             fn_name: "fund_invoice",
             args: (t.funder.clone(), invoice_id, INVOICE_AMOUNT).into_val(&t.env),
             sub_invokes,
+        },
+    }]);
+}
+
+fn set_update_invoice_auth(t: &AuthTestEnv, signer: &Address, invoice_id: u64) {
+    t.env.mock_auths(&[MockAuth {
+        address: signer,
+        invoke: &MockAuthInvoke {
+            contract: &t.contract_id,
+            fn_name: "update_invoice",
+            args: (invoice_id, INVOICE_AMOUNT, due_date(t) + 1, DISCOUNT_RATE).into_val(&t.env),
+            sub_invokes: &[],
         },
     }]);
 }
@@ -325,6 +355,29 @@ fn fund_invoice_accepts_funder_signature() {
 
     set_fund_invoice_auth(&t, &t.funder, invoice_id, true);
     let result = invoke_fund_invoice(&t, invoice_id);
+
+    assert_eq!(expect_success(result), ());
+}
+
+#[test]
+fn update_invoice_rejects_wrong_signer() {
+    let t = setup();
+    let invoice_id = submit_invoice_authorized(&t);
+    let impostor = Address::generate(&t.env);
+
+    set_update_invoice_auth(&t, &impostor, invoice_id);
+    let result = invoke_update_invoice(&t, invoice_id);
+
+    assert_eq!(result, Err(Ok(auth_error())));
+}
+
+#[test]
+fn update_invoice_accepts_freelancer_signature() {
+    let t = setup();
+    let invoice_id = submit_invoice_authorized(&t);
+
+    set_update_invoice_auth(&t, &t.freelancer, invoice_id);
+    let result = invoke_update_invoice(&t, invoice_id);
 
     assert_eq!(expect_success(result), ());
 }
