@@ -1,5 +1,6 @@
 # Invoice Liquidity Network
 
+[![codecov](https://codecov.io/gh/Ojukwu-Chinedu/Invoice-Liquidity-Network/branch/main/graph/badge.svg)](https://codecov.io/gh/Ojukwu-Chinedu/Invoice-Liquidity-Network)
 [![CI](https://github.com/Nursca/Invoice-Liquidity-Network/actions/workflows/ci.yml/badge.svg)](https://github.com/Nursca/Invoice-Liquidity-Network/actions/workflows/ci.yml)
 
 **Turn unpaid invoices into instant liquidity on-chain, on Stellar.**
@@ -84,6 +85,35 @@ The repository now includes a typed SDK package at [sdk/README.md](/Users/mac/De
 
 ```bash
 npm install @invoice-liquidity/sdk
+```
+
+## CLI
+
+The repository also includes a dedicated CLI package in [cli/README.md](./cli/README.md).
+
+```bash
+npm install -g @invoice-liquidity/cli
+```
+
+Create a `.iln.json` file with your network, contract, token, and signer settings:
+
+```json
+{
+  "network": "testnet",
+  "contractId": "CD3TE3IAHM737P236XZL2OYU275ZKD6MN7YH7PYYAXYIGEH55OPEWYJC",
+  "tokenId": "CDUMMYYOURTOKENIDHERE",
+  "keypairPath": "~/.config/iln/freelancer.secret"
+}
+```
+
+Common commands:
+
+```bash
+iln submit --payer G... --amount 100 --due 2025-12-31 --rate 300
+iln fund --id 1
+iln pay --id 1
+iln status --id 1
+iln list --address G...
 ```
 
 ## Frontend Snapshot Tests
@@ -287,6 +317,39 @@ stellar keys generate --global alice --network testnet
 stellar keys fund alice --network testnet
 ```
 
+### Development Wallet Funding
+
+To simplify testing on Stellar Testnet, use the `fund-wallets.sh` script. This script automatically funds addresses with testnet XLM via Friendbot and mints mock USDC if an admin key is provided.
+
+#### Environment Setup
+
+Ensure the following environment variables are set:
+
+| Variable | Description |
+|----------|-------------|
+| `ADMIN_SECRET` | Secret key of the USDC issuer/admin (required for minting) |
+| `USDC_CONTRACT_ID` | Contract ID of the mock USDC on Testnet |
+
+#### Usage
+
+**1. Using command-line arguments:**
+```bash
+./scripts/fund-wallets.sh GADDRESS1... GADDRESS2...
+```
+
+**2. Using a batch file:**
+Create a `dev-wallets.txt` file in the root directory with one address per line, then run:
+```bash
+./scripts/fund-wallets.sh
+```
+
+**3. Via Makefile:**
+```bash
+make seed
+```
+
+The script includes automatic retries with exponential backoff to handle rate limits and will output a summary table of balances upon completion.
+
 ### Build & Test
 
 ```bash
@@ -296,6 +359,10 @@ cargo build --target wasm32-unknown-unknown --release
 
 # Run tests
 cargo test
+
+#### Regression Testing
+When fixing a bug, you must add a regression test to `contracts/invoice_liquidity/src/tests_regression.rs`.
+Please include a comment with `/// Regression for: [Issue/PR description]` to document the edge-case and prevent future regressions.
 
 # Deploy to testnet
 stellar contract deploy \

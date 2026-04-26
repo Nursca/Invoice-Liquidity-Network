@@ -12,6 +12,8 @@ pub enum InvoiceStatus {
     PartiallyFunded, // partially funded by one or more LPs
     Paid,            // payer has settled in full, LP has been released
     Defaulted,       // past due_date and still unpaid
+    Expired,         // past due_date with no funding
+    Cancelled,       // freelancer cancelled the invoice before funding
 }
 
 // ----------------------------------------------------------------
@@ -44,7 +46,6 @@ pub struct InvoiceParams {
     pub discount_rate: u32,
     pub token: Address,
 }
-
 
 #[contracttype]
 #[derive(Clone, Debug, Default)]
@@ -79,9 +80,11 @@ pub enum StorageKey {
 // ----------------------------------------------------------------
 
 pub fn save_invoice(env: &Env, invoice: &Invoice) {
+    let key = StorageKey::Invoice(invoice.id);
+    env.storage().persistent().set(&key, invoice);
     env.storage()
         .persistent()
-        .set(&StorageKey::Invoice(invoice.id), invoice);
+        .extend_ttl(&key, 1_000_000, 2_000_000);
 }
 
 pub fn load_invoice(env: &Env, id: u64) -> Invoice {
