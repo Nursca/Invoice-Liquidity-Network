@@ -1,5 +1,6 @@
 # Invoice Liquidity Network
 
+[![codecov](https://codecov.io/gh/Ojukwu-Chinedu/Invoice-Liquidity-Network/branch/main/graph/badge.svg)](https://codecov.io/gh/Ojukwu-Chinedu/Invoice-Liquidity-Network)
 [![CI](https://github.com/Nursca/Invoice-Liquidity-Network/actions/workflows/ci.yml/badge.svg)](https://github.com/Nursca/Invoice-Liquidity-Network/actions/workflows/ci.yml)
 
 **Turn unpaid invoices into instant liquidity on-chain, on Stellar.**
@@ -84,6 +85,35 @@ The repository now includes a typed SDK package at [sdk/README.md](/Users/mac/De
 
 ```bash
 npm install @invoice-liquidity/sdk
+```
+
+## CLI
+
+The repository also includes a dedicated CLI package in [cli/README.md](./cli/README.md).
+
+```bash
+npm install -g @invoice-liquidity/cli
+```
+
+Create a `.iln.json` file with your network, contract, token, and signer settings:
+
+```json
+{
+  "network": "testnet",
+  "contractId": "CD3TE3IAHM737P236XZL2OYU275ZKD6MN7YH7PYYAXYIGEH55OPEWYJC",
+  "tokenId": "CDUMMYYOURTOKENIDHERE",
+  "keypairPath": "~/.config/iln/freelancer.secret"
+}
+```
+
+Common commands:
+
+```bash
+iln submit --payer G... --amount 100 --due 2025-12-31 --rate 300
+iln fund --id 1
+iln pay --id 1
+iln status --id 1
+iln list --address G...
 ```
 
 ## Frontend Snapshot Tests
@@ -329,6 +359,10 @@ cargo build --target wasm32-unknown-unknown --release
 
 # Run tests
 cargo test
+
+#### Regression Testing
+When fixing a bug, you must add a regression test to `contracts/invoice_liquidity/src/tests_regression.rs`.
+Please include a comment with `/// Regression for: [Issue/PR description]` to document the edge-case and prevent future regressions.
 
 # Deploy to testnet
 stellar contract deploy \
