@@ -203,6 +203,7 @@ function Spinner({ label = "Loading…" }: { label?: string }) {
 
 function CopyLinkButton({ url }: { url: string }) {
   const [copied, setCopied] = useState(false);
+  const { addToast } = useToast();
 
   const handleCopy = async () => {
     try {
@@ -210,7 +211,7 @@ function CopyLinkButton({ url }: { url: string }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2_500);
     } catch {
-      // Clipboard API unavailable — silently ignore
+      addToast({ type: "error", title: "Copy failed", message: "Unable to copy link. Please copy the URL manually." });
     }
   };
 
@@ -248,7 +249,7 @@ function CopyPayerLinkButton({ invoiceId }: { invoiceId: string }) {
       addToast({ type: "success", title: "Link copied!", message: "Direct settlement link ready to share with the payer." });
       setTimeout(() => setCopied(false), 2_500);
     } catch {
-      // ignore
+      addToast({ type: "error", title: "Copy failed", message: "Unable to copy link. Please copy the URL manually." });
     }
   };
 

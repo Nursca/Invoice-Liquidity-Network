@@ -4,6 +4,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { NETWORK_NAME } from "../constants";
 import TokenSelector, { TokenAmount } from "../components/TokenSelector";
+import FieldTooltip from "./FieldTooltip";
 import { useToast } from "../context/ToastContext";
 import { useWallet } from "../context/WalletContext";
 import { useApprovedTokens } from "../hooks/useApprovedTokens";
@@ -218,6 +219,7 @@ export default function SubmitInvoiceForm({ initialValues, prefillId }: SubmitIn
           <div className="space-y-5">
             <Field
               label={t("submitForm.payerLabel")}
+              tooltip="The Stellar wallet address of the person or company who owes you payment. They'll need to sign a transaction to settle."
               error={errors.payer}
               hint={t("submitForm.payerHint")}
             >
@@ -233,6 +235,7 @@ export default function SubmitInvoiceForm({ initialValues, prefillId }: SubmitIn
 
             <TokenSelector
               label={t("submitForm.tokenLabel")}
+              tooltip="The currency for this invoice. Currently supported: USDC, EURC, XLM."
               value={effectiveTokenId}
               tokens={tokens}
               error={errors.tokenId}
@@ -248,7 +251,11 @@ export default function SubmitInvoiceForm({ initialValues, prefillId }: SubmitIn
             />
 
             <div className="grid gap-5 md:grid-cols-2">
-              <Field label={`${t("submitForm.amountLabel")}${selectedToken ? ` (${selectedToken.symbol})` : ""}`} error={errors.amount}>
+              <Field 
+                label={`${t("submitForm.amountLabel")}${selectedToken ? ` (${selectedToken.symbol})` : ""}`} 
+                tooltip="The full value of the invoice in USDC. This is what the payer owes you in total."
+                error={errors.amount}
+              >
                 <input
                   value={form.amount}
                   onChange={(event) => setField("amount", event.target.value)}
@@ -258,7 +265,11 @@ export default function SubmitInvoiceForm({ initialValues, prefillId }: SubmitIn
                 />
               </Field>
 
-              <Field label={t("submitForm.dueDateLabel")} error={errors.dueDate}>
+              <Field 
+                label="Due date" 
+                tooltip="The date by which the payer must settle. LPs can claim a default if this passes without payment."
+                error={errors.dueDate}
+              >
                 <input
                   value={form.dueDate}
                   onChange={(event) => setField("dueDate", event.target.value)}
@@ -270,7 +281,13 @@ export default function SubmitInvoiceForm({ initialValues, prefillId }: SubmitIn
             </div>
 
             <Field
-              label={t("submitForm.discountRateLabel")}
+              label="Discount rate (%)"
+              tooltip={
+                <>
+                  How much of the invoice value you give up in exchange for instant payment. 300 basis points = 3%. A lower rate attracts more LPs; a higher rate means you receive less upfront.
+                  <div className="mt-2 font-bold text-primary">Typical value: 100–500 bps</div>
+                </>
+              }
               error={errors.discountRate}
               hint={t("submitForm.discountRateHint")}
             >
@@ -286,6 +303,11 @@ export default function SubmitInvoiceForm({ initialValues, prefillId }: SubmitIn
                   {preview.discountRatePercent.toFixed(2)}%
                 </div>
               </div>
+              {form.amount && selectedToken && (
+                <p className="mt-3 text-xs font-medium text-primary bg-primary/5 p-3 rounded-xl border border-primary/10 animate-in fade-in slide-in-from-top-1">
+                  You&apos;ll receive <span className="font-bold">{preview.payoutFormatted} {selectedToken.symbol}</span> instantly if funded at this rate
+                </p>
+              )}
             </Field>
 
             {errors.submit ? (
@@ -345,11 +367,13 @@ export default function SubmitInvoiceForm({ initialValues, prefillId }: SubmitIn
 
 function Field({
   label,
+  tooltip,
   hint,
   error,
   children,
 }: {
   label: string;
+  tooltip?: string | ReactNode;
   hint?: string;
   error?: string;
   children: ReactNode;
@@ -357,7 +381,10 @@ function Field({
   return (
     <label className="block">
       <div className="flex items-center justify-between gap-3 mb-2">
-        <span className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant">{label}</span>
+        <span className="text-xs font-bold uppercase tracking-[0.22em] text-on-surface-variant flex items-center">
+          {label}
+          {tooltip && <FieldTooltip content={tooltip} />}
+        </span>
         {error ? <span className="text-xs font-bold text-error">{error}</span> : null}
       </div>
       {children}
