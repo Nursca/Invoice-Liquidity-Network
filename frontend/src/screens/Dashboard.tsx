@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Footer from "../../components/Footer";
 import Navbar from "../../components/Navbar";
 import InvoiceQRModal from "../../components/InvoiceQRModal";
 import InvoiceTimeline from "../../components/InvoiceTimeline";
 import { CONTRACT_ID, NETWORK_NAME } from "../../constants";
 import { useWallet } from "../../context/WalletContext";
+import { useToast } from "../../context/ToastContext";
 import { formatAddress, formatDate, formatUSDC } from "../../utils/format";
 import { type Invoice } from "../../utils/soroban";
 import { useInvoices } from "../../hooks/useInvoices";
@@ -43,6 +45,8 @@ export function applyFreelancerFiltersAndSort(
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { addToast } = useToast();
   const { address, connect, isConnected } = useWallet();
   const { data: allInvoices = [], isLoading: loading, dataUpdatedAt, refetch } = useInvoices();
   
@@ -84,6 +88,36 @@ export default function DashboardPage() {
     }
     setSortKey(nextSortKey);
     setSortOrder("asc");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTableRowElement>, invoice: Invoice, index: number) => {
+    const rowElements = Array.from(e.currentTarget.parentElement?.querySelectorAll('tr[role="row"]') || []);
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        (rowElements[index + 1] as HTMLElement)?.focus();
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        (rowElements[index - 1] as HTMLElement)?.focus();
+        break;
+      case "Enter":
+        e.preventDefault();
+        router.push(`/i/${invoice.id.toString()}`);
+        break;
+      case "c":
+      case "C":
+        if (invoice.status === "Pending") {
+          e.preventDefault();
+          addToast({
+            type: "info",
+            title: "Cancel Action",
+            message: `Cancellation for invoice #${invoice.id.toString()} triggered via shortcut. Contract implementation pending.`,
+          });
+        }
+        break;
+    }
   };
 
   const copyPayerAddress = async (payer: string) => {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { useWallet } from "../context/WalletContext";
 import { useToast } from "../context/ToastContext";
 import TokenSelector, { TokenAmount } from "./TokenSelector";
@@ -32,6 +33,7 @@ import { useTranslation } from "react-i18next";
 type Tab = "discovery" | "my-funded" | "watchlist";
 
 export default function LPDashboard() {
+  const router = useRouter();
   const { address, connect, signTx } = useWallet();
   const { addToast } = useToast();
   const { tokenMap, defaultToken } = useApprovedTokens();
@@ -211,11 +213,189 @@ export default function LPDashboard() {
     }
   };
 
-  // Toast helper for nested components
-  const updateToast = useCallback((id: string, props: any) => {
-    // This is a bit of a hack since useToast doesn't export updateToast directly in some versions
-    // or it's named differently. Assuming it exists based on previous code.
-  }, []);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTableRowElement>, invoice: any, index: number) => {
+    const rowElements = Array.from(e.currentTarget.parentElement?.querySelectorAll('tr[role="row"]') || []);
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        (rowElements[index + 1] as HTMLElement)?.focus();
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        (rowElements[index - 1] as HTMLElement)?.focus();
+        break;
+      case "Enter":
+        e.preventDefault();
+        router.push(`/i/${invoice.id.toString()}`);
+        break;
+      case "f":
+      case "F":
+        if (activeTab === "discovery" || (activeTab === "watchlist" && invoice.status === "Pending")) {
+          e.preventDefault();
+          handleFund(invoice);
+        }
+        break;
+    }
+  };
+
+  const commonColumns: ColumnDefinition<any>[] = [
+    {
+      id: "id",
+      label: "ID",
+      isMandatory: true,
+      sortable: true,
+      renderCell: (inv) => <span className="font-bold text-primary">#{inv.id.toString()}</span>,
+    },
+    {
+      id: "freelancer",
+      label: "Freelancer",
+      sortable: false,
+      renderCell: (inv) => (
+        <div className="flex flex-col">
+          <span className="text-sm font-medium">{formatAddress(inv.freelancer)}</span>
+          <span className="text-[10px] text-on-surface-variant">Payer: {formatAddress(inv.payer)}</span>
+        </div>
+      ),
+    },
+    {
+      id: "amount",
+      label: "Amount",
+      sortable: true,
+      renderCell: (inv) => (
+        <TokenAwareAmount amount={inv.amount} invoice={inv} tokenMap={tokenMap} defaultToken={defaultToken} />
+      ),
+    },
+    {
+      id: "discount_rate",
+      label: "Discount",
+      sortable: true,
+      renderCell: (inv) => (
+        <span className="bg-primary-container text-on-primary-container px-2 py-0.5 rounded text-xs font-bold">
+          {(inv.discount_rate / 100).toFixed(2)}%
+        </span>
+      ),
+    },
+    {
+      id: "due_date",
+      label: "Due Date",
+      sortable: true,
+      renderCell: (inv) => <span className="text-sm">{formatDate(inv.due_date)}</span>,
+    },
+    {
+      id: "yield",
+      label: "Est. Yield",
+      sortable: false,
+      renderCell: (inv) => (
+        <span className="font-bold text-green-600">
+          <TokenAwareAmount
+            amount={calculateYield(inv.amount, inv.discount_rate)}
+            invoice={inv}
+            tokenMap={tokenMap}
+            defaultToken={defaultToken}
+          />
+        </span>
+      ),
+    },
+  ];
+
+  const discoveryColumns: ColumnDefinition<any>[] = [
+    ...commonColumns,
+    {
+      id: "risk",
+      label: "Risk",
+      sortable: true,
+      renderCell: (inv) => (
+        <RiskBadge
+          risk={payerRisks.get(inv.payer) ?? "Unknown"}
+          score={payerScores.get(inv.payer) ?? null}
+        />
+      ),
+    },
+    {
+      id: "actions",
+      label: "",
+      sortable: false,
+      renderCell: (inv) => (
+        <div className="flex items-center justify-end gap-2 text-right">
+          <button
+            onClick={(e) => handleWatchlistToggle(inv.id, e)}
+            className={`p-2 rounded-full transition-colors ${
+              isInWatchlist(inv.id) ? "text-red-500 hover:bg-red-50" : "text-on-surface-variant hover:bg-surface-variant/50"
+            }`}
+            title={isInWatchlist(inv.id) ? "Remove from watchlist" : "Add to watchlist"}
+          >
+            <span
+              className="material-symbols-outlined text-[20px]"
+              style={{ fontVariationSettings: isInWatchlist(inv.id) ? "'FILL' 1" : "'FILL' 0" }}
+            >
+              bookmark
+            </span>
+          </button>
+          <button
+            onClick={() => handleFund(inv)}
+            className="bg-primary text-surface-container-lowest text-xs px-4 py-2 rounded-lg font-bold hover:bg-primary/90 shadow-sm active:scale-95 transition-all"
+          >
+            Fund
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  const watchlistColumns: ColumnDefinition<any>[] = [
+    ...commonColumns,
+    {
+      id: "watchAddedAt",
+      label: "Added",
+      sortable: true,
+      renderCell: (inv) => (
+        <span className="text-xs text-on-surface-variant">
+          {new Date(inv.watchAddedAt).toLocaleDateString(getLocale())}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      label: "",
+      sortable: false,
+      renderCell: (inv) => (
+        <div className="flex items-center justify-end gap-2 text-right">
+          <button
+            onClick={(e) => handleWatchlistToggle(inv.id, e)}
+            className="p-2 rounded-full transition-colors text-red-500 hover:bg-red-50"
+            title="Remove from watchlist"
+          >
+            <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+              bookmark
+            </span>
+          </button>
+          {inv.status === "Pending" ? (
+            <button
+              onClick={() => handleFund(inv)}
+              className="bg-primary text-surface-container-lowest text-xs px-4 py-2 rounded-lg font-bold hover:bg-primary/90 shadow-sm active:scale-95 transition-all"
+            >
+              Fund
+            </button>
+          ) : (
+            <div className="flex flex-col items-end gap-1">
+              <span
+                className={`text-[10px] font-bold uppercase px-2 py-1 rounded ${
+                  inv.status === "Funded" ? "bg-blue-100 text-blue-700" : inv.status === "Paid" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                }`}
+              >
+                {inv.status}
+              </span>
+              <span className="text-[10px] bg-error-container text-on-error-container px-2 py-0.5 rounded flex items-center gap-1">
+                <span className="material-symbols-outlined text-[10px]">warning</span>
+                Already funded
+              </span>
+            </div>
+          )}
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div className="bg-surface-container-lowest rounded-2xl shadow-xl overflow-hidden border border-outline-variant/10 min-h-[500px]">
