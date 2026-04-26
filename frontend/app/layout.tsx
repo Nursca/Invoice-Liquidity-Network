@@ -5,6 +5,7 @@ import { WalletProvider } from "../context/WalletContext";
 import { NotificationProvider } from "../context/NotificationContext";
 import OnboardingFlow from "../components/onboarding/OnboardingFlow";
 import NetworkBanner from "../components/NetworkBanner";
+import FABProvider from "../components/FABProvider";
 import CommandPalette from "../components/CommandPalette";
 import Providers from "./Providers";
 
@@ -47,6 +48,18 @@ export default function RootLayout({
       <body
         className="antialiased bg-background text-foreground transition-colors duration-300 selection:bg-primary-container selection:text-on-primary-container"
       >
+        <ToastProvider>
+          <WalletProvider>
+            <div className="min-h-screen flex flex-col">
+              <NetworkBanner />
+              <div className="flex-1">
+                {children}
+              </div>
+            </div>
+            <OnboardingFlow />
+            <FABProvider />
+          </WalletProvider>
+        </ToastProvider>
         <Providers>
           <ToastProvider>
             <WalletProvider>
