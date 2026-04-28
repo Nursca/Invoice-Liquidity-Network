@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { triggerShortcutsModalOpen } from "./useKeyboardShortcuts";
 
 export interface Command {
   id: string;
@@ -44,6 +45,7 @@ export function useCommandPalette() {
     { id: "notifications", label: "Open notification settings", action: () => alert("Notification settings coming soon"), category: "settings" },
     { id: "addressbook", label: "Open address book", action: () => alert("Address book coming soon"), category: "settings" },
     { id: "darkmode", label: "Toggle dark mode", action: () => document.documentElement.classList.toggle("dark"), category: "settings" },
+    { id: "shortcuts", label: "Keyboard shortcuts", action: () => triggerShortcutsModalOpen(), category: "settings" },
   ], [router]);
 
   useEffect(() => {
