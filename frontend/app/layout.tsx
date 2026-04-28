@@ -6,7 +6,7 @@ import { NotificationProvider } from "../context/NotificationContext";
 import OnboardingFlow from "../components/onboarding/OnboardingFlow";
 import NetworkBanner from "../components/NetworkBanner";
 import FABProvider from "../components/FABProvider";
-import CommandPalette from "../components/CommandPalette";
+import GlobalKeyboardOverlays from "../components/GlobalKeyboardOverlays";
 import Providers from "./Providers";
 
 
@@ -74,7 +74,7 @@ export default function RootLayout({
               </NotificationProvider>
             </WalletProvider>
           </ToastProvider>
-          <CommandPalette />
+          <GlobalKeyboardOverlays />
         </Providers>
       </body>
     </html>
