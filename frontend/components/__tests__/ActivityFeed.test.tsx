@@ -30,7 +30,7 @@ describe('ActivityFeed', () => {
     render(<ActivityFeed invoiceId={1n} />);
 
     await waitFor(() => {
-      expect(screen.getByText('No activity recorded yet.')).toBeInTheDocument();
+      expect(screen.getByText('No activity yet for this invoice')).toBeInTheDocument();
     });
   });
 
@@ -58,7 +58,7 @@ describe('ActivityFeed', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Invoice submitted by GABC12\.\.\.3456/)).toBeInTheDocument();
-      expect(screen.getByText(/Invoice funded by GDEF56\.\.\.3456 for 500.00 USDC/)).toBeInTheDocument();
+      expect(screen.getByText(/Invoice funded by GDEF56\.\.\.3456 for 500 USDC/)).toBeInTheDocument();
       expect(screen.getByText('1 hours ago')).toBeInTheDocument();
     });
   });
@@ -70,7 +70,7 @@ describe('ActivityFeed', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Invoice submitted by GABC12\.\.\.3456/)).toBeInTheDocument();
-      expect(screen.getByText(/Invoice funded by GDEF56\.\.\.3456 for 100.00 USDC/)).toBeInTheDocument();
+      expect(screen.getByText(/Invoice funded by GDEF56\.\.\.3456 for 100 USDC/)).toBeInTheDocument();
     });
   });
 });

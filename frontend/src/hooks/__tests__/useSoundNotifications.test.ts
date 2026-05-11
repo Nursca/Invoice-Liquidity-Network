@@ -2,18 +2,22 @@
  * Tests for useSoundNotifications — Issue #166
  */
 
+import { vi, describe, beforeEach, test, expect } from "vitest";
+import { renderHook, act } from "@testing-library/react";
+import { useSoundNotifications } from "../useSoundNotifications";
+
 // Minimal AudioContext stub
 class MockOscillator {
   type = "sine";
-  frequency = { setValueAtTime: jest.fn() };
-  connect = jest.fn();
-  start = jest.fn();
-  stop = jest.fn();
+  frequency = { setValueAtTime: vi.fn() };
+  connect = vi.fn();
+  start = vi.fn();
+  stop = vi.fn();
 }
 
 class MockGainNode {
-  gain = { setValueAtTime: jest.fn(), exponentialRampToValueAtTime: jest.fn() };
-  connect = jest.fn();
+  gain = { setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() };
+  connect = vi.fn();
 }
 
 class MockAudioContext {
@@ -26,8 +30,6 @@ class MockAudioContext {
 // @ts-expect-error — override for tests
 global.AudioContext = MockAudioContext;
 
-import { renderHook, act } from "@testing-library/react";
-import { useSoundNotifications } from "../useSoundNotifications";
 
 describe("useSoundNotifications (#166)", () => {
   beforeEach(() => {

@@ -13,7 +13,7 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
-vi.mock("../../context/WalletContext", () => ({
+vi.mock("../../../context/WalletContext", () => ({
   useWallet: () => ({
     address: "GD...",
     connect: vi.fn(),
@@ -21,14 +21,14 @@ vi.mock("../../context/WalletContext", () => ({
   }),
 }));
 
-vi.mock("../../context/ToastContext", () => ({
+vi.mock("../../../context/ToastContext", () => ({
   useToast: () => ({
     addToast: vi.fn(),
     updateToast: vi.fn(),
   }),
 }));
 
-vi.mock("../../utils/soroban", () => ({
+vi.mock("../../../utils/soroban", () => ({
   getAllInvoices: vi.fn().mockResolvedValue([
     { id: BigInt(1), amount: BigInt(10000000), discount_rate: 500, due_date: BigInt(Math.floor(Date.now()/1000) + 86400 * 10), payer: "P1", status: "Pending" },
     { id: BigInt(2), amount: BigInt(20000000), discount_rate: 600, due_date: BigInt(Math.floor(Date.now()/1000) + 86400 * 5), payer: "P2", status: "Pending" },
@@ -39,7 +39,7 @@ vi.mock("../../utils/soroban", () => ({
   submitSignedTransaction: vi.fn(),
 }));
 
-vi.mock("../../hooks/useApprovedTokens", () => ({
+vi.mock("../../../hooks/useApprovedTokens", () => ({
   useApprovedTokens: () => ({
     tokens: [],
     tokenMap: new Map(),
@@ -47,7 +47,7 @@ vi.mock("../../hooks/useApprovedTokens", () => ({
   }),
 }));
 
-vi.mock("../../hooks/usePayerScores", () => ({
+vi.mock("../../../hooks/usePayerScores", () => ({
   usePayerScores: () => ({
     scores: new Map([["P1", 80], ["P2", 90], ["P3", 70]]),
     risks: new Map([["P1", "Low"], ["P2", "Very Low"], ["P3", "Medium"]]),

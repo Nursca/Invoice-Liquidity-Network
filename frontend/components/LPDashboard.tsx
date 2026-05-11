@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "react-i18next";
 import { useWallet } from "../context/WalletContext";
 import { useToast } from "../context/ToastContext";
 import TokenSelector, { TokenAmount } from "./TokenSelector";
 import InvoiceFilterBar from "./InvoiceFilterBar";
 import { useApprovedTokens } from "../hooks/useApprovedTokens";
 import { applyInvoiceFilters, useInvoiceFilters } from "../hooks/useInvoiceFilters";
+import { useInvoices } from "../hooks/useInvoices";
 import SkeletonRow, { LP_DISCOVERY_COLUMNS } from "./SkeletonRow";
 import { EmptyState } from "./EmptyState";
 import { LPDiscoveryEmptyIllustration, NotificationsEmptyIllustration } from "./illustrations/EmptyIllustrations";
@@ -19,7 +21,6 @@ import {
   Invoice,
   submitSignedTransaction,
 } from "../utils/soroban";
-import { formatUSDC, formatAddress, formatDate, calculateYield } from "../utils/format";
 import { formatAddress, formatDate, formatTokenAmount, calculateYield } from "../utils/format";
 import { useWatchlist } from "../hooks/useWatchlist";
 import { usePayerScores } from "../hooks/usePayerScores";
@@ -27,6 +28,10 @@ import RiskBadge from "./RiskBadge";
 import LPPortfolio from "./LPPortfolio";
 import { RISK_SORT_ORDER } from "../utils/risk";
 import { ExportButton } from "./ExportButton";
+import YieldCalculator from "./YieldCalculator";
+import LastUpdated from "./LastUpdated";
+import InvoiceStatusBadge from "./InvoiceStatusBadge";
+import type { ColumnDefinition } from "./DataTable";
 
 
 type Tab = "discovery" | "my-funded" | "watchlist";
@@ -96,7 +101,6 @@ export default function LPDashboard() {
     return () => clearTimeout(timer);
   }, [fetchData]);
 
-  const discoveryInvoicesList = invoices.filter(i => i.status === "Pending");
   const discoveryInvoicesList = useMemo(() => invoices.filter(i => i.status === "Pending"), [invoices]);
   const { scores: payerScores, risks: payerRisks } = usePayerScores(discoveryInvoicesList);
 
@@ -183,6 +187,7 @@ export default function LPDashboard() {
       setClaimingInvoiceId(null);
     }
   };
+
   const filteredInvoices = useMemo(
     () =>
       applyInvoiceFilters(invoices, filters, {
@@ -194,17 +199,6 @@ export default function LPDashboard() {
     [defaultToken?.contractId, filters, invoices, tokenMap],
   );
 
-  const sortedInvoices = [...filteredInvoices].sort((a: any, b: any) => {
-  const filteredInvoices = useMemo(
-    () =>
-      applyInvoiceFilters(invoices, filters, {
-        resolveTokenSymbol: (invoice) => {
-          const token = tokenMap.get(invoice.token ?? defaultToken?.contractId ?? "");
-          return token?.symbol ?? "USDC";
-        },
-      }),
-    [defaultToken?.contractId, filters, invoices, tokenMap],
-  );
 
   const sortedInvoices = useMemo(() => [...filteredInvoices].sort((a: any, b: any) => {
     if (sortKey === "risk") {
@@ -283,7 +277,6 @@ export default function LPDashboard() {
       id: "freelancer",
       label: "Freelancer",
       sortable: false,
-      renderCell: (inv) => (
       renderCell: (inv: Invoice) => (
         <div className="flex flex-col">
           <span className="text-sm font-medium">{formatAddress(inv.freelancer)}</span>
@@ -493,36 +486,25 @@ export default function LPDashboard() {
         )}
       </div>
       <div className="px-6 pt-4 flex flex-col gap-3">
+        <YieldCalculator
+          onFindMatching={(amount, discountRate) => {
+            // Set filters to match the calculator values
+            setFilters({
+              ...filters,
+              minAmount: amount,
+              discountRateMin: discountRate,
+              discountRateMax: discountRate + 50, // Allow some tolerance
+            });
+          }}
+        />
         <InvoiceFilterBar
           filters={filters}
           onFiltersChange={setFilters}
           onClearFilters={clearFilters}
           activeFilterCount={activeFilterCount}
         />
-        <div className="flex justify-between items-center">
-          <ExportButton data={filteredInvoices} filenamePrefix="iln-lp-export" />
-        </div>
+        <ExportButton data={filteredInvoices} filenamePrefix="iln-lp-export" />
       </div>
-       <div className="px-6 pt-4 flex flex-col gap-3">
-         <YieldCalculator
-           onFindMatching={(amount, discountRate) => {
-             // Set filters to match the calculator values
-             setFilters({
-               ...filters,
-               minAmount: amount,
-               discountRateMin: discountRate,
-               discountRateMax: discountRate + 50, // Allow some tolerance
-             });
-           }}
-         />
-         <InvoiceFilterBar
-           filters={filters}
-           onFiltersChange={setFilters}
-           onClearFilters={clearFilters}
-           activeFilterCount={activeFilterCount}
-         />
-         <ExportButton data={filteredInvoices} filenamePrefix="iln-lp-export" />
-       </div>
 
       {activeTab === "my-funded" ? (
         <LPPortfolio

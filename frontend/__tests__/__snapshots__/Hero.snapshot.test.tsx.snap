@@ -25,11 +25,9 @@ exports[`Hero snapshots > matches the landing page hero section 1`] = `
           class="text-5xl lg:text-7xl font-medium text-on-primary-container leading-[1.1] mb-6 font-headline"
         >
           Turn unpaid invoices into 
-          <span
-            class="italic"
-          >
+          <bold>
             instant
-          </span>
+          </bold>
            liquidity
         </h1>
         <p

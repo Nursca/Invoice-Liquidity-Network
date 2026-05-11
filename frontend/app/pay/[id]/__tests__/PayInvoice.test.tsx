@@ -47,7 +47,9 @@ describe('PayInvoicePage', () => {
       connect: vi.fn(),
     });
 
-    render(<PayInvoicePage params={Promise.resolve({ id: '1' })} />);
+    const params = Promise.resolve({ id: '1' }) as any;
+    params._resolvedValue = { id: '1' };
+    render(<PayInvoicePage params={params} />);
 
     await waitFor(() => {
       expect(screen.getByText(/100\s+USDC/)).toBeInTheDocument();
@@ -61,7 +63,9 @@ describe('PayInvoicePage', () => {
       connect: vi.fn(),
     });
 
-    render(<PayInvoicePage params={Promise.resolve({ id: '1' })} />);
+    const params = Promise.resolve({ id: '1' }) as any;
+    params._resolvedValue = { id: '1' };
+    render(<PayInvoicePage params={params} />);
 
     await waitFor(() => {
       expect(screen.getByText('Address Mismatch')).toBeInTheDocument();
@@ -79,7 +83,9 @@ describe('PayInvoicePage', () => {
       address: 'GPAYER',
     });
 
-    render(<PayInvoicePage params={Promise.resolve({ id: '1' })} />);
+    const params = Promise.resolve({ id: '1' }) as any;
+    params._resolvedValue = { id: '1' };
+    render(<PayInvoicePage params={params} />);
 
     await waitFor(() => {
       expect(screen.getByText('Invoice settled')).toBeInTheDocument();
@@ -97,7 +103,9 @@ describe('PayInvoicePage', () => {
     (soroban.markPaid as any).mockResolvedValue('mock-tx');
     (soroban.submitSignedTransaction as any).mockResolvedValue({ txHash: 'hash123' });
 
-    render(<PayInvoicePage params={Promise.resolve({ id: '1' })} />);
+    const params = Promise.resolve({ id: '1' }) as any;
+    params._resolvedValue = { id: '1' };
+    render(<PayInvoicePage params={params} />);
 
     await waitFor(() => {
       expect(screen.getByText('Settle Invoice Now')).toBeInTheDocument();

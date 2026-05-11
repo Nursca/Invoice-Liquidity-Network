@@ -96,6 +96,20 @@ export default function InvoiceTable<T>({
     setVisibleColumns(defaultVisible);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, item: T, index: number) => {
+    if (e.key === "Enter") {
+      router.push(`/i/${keyExtractor(item)}`);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextRow = (e.currentTarget.nextSibling) as HTMLElement;
+      nextRow?.focus();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const prevRow = (e.currentTarget.previousSibling) as HTMLElement;
+      prevRow?.focus();
+    }
+  };
+
   const activeColumns = useMemo(() => {
     return columnOrder
       .map((id) => columns.find((c) => c.id === id))
@@ -121,7 +135,7 @@ export default function InvoiceTable<T>({
         <table className="w-full text-left">
           <thead className="bg-surface-container-low">
             <tr>
-              {activeColumns.map((col) => (
+              {activeColumns.map((col, idx) => (
                 <th
                   key={col.id}
                   onClick={() => col.sortable && onSort?.(col.id)}

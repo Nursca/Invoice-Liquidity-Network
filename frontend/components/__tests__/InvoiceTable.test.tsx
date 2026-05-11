@@ -35,8 +35,8 @@ describe("InvoiceTable", () => {
     
     // Toggle visibility of 'name'
     fireEvent.click(screen.getByText(/Columns/i));
-    const nameRow = screen.getByText("Name").closest("label");
-    const checkbox = nameRow?.querySelector('input[type="checkbox"]');
+    const nameLabel = screen.getAllByText("Name").find(el => el.closest('label'));
+    const checkbox = nameLabel?.closest('label')?.querySelector('input[type="checkbox"]');
     if (checkbox) fireEvent.click(checkbox);
 
     // Check localStorage
@@ -54,9 +54,9 @@ describe("InvoiceTable", () => {
     // Hide 'name' on table 1
     render(<InvoiceTable tableId={tableId} data={mockData} columns={mockColumns} keyExtractor={(d) => d.id} />);
     fireEvent.click(screen.getByText(/Columns/i));
-    const nameRow = screen.getByText("Name").closest("label");
-    const checkbox = nameRow?.querySelector('input[type="checkbox"]');
-    if (checkbox) fireEvent.click(checkbox);
+    const nameLabel1 = screen.getAllByText("Name").find(el => el.closest('label'));
+    const checkbox1 = nameLabel1?.closest('label')?.querySelector('input[type="checkbox"]');
+    if (checkbox1) fireEvent.click(checkbox1);
 
     // Table 2 should still show 'name'
     render(<InvoiceTable tableId={tableId2} data={mockData} columns={mockColumns} keyExtractor={(d) => d.id} />);
@@ -69,9 +69,9 @@ describe("InvoiceTable", () => {
     
     // Hide 'name'
     fireEvent.click(screen.getByText(/Columns/i));
-    const nameRow = screen.getByText("Name").closest("label");
-    const checkbox = nameRow?.querySelector('input[type="checkbox"]');
-    if (checkbox) fireEvent.click(checkbox);
+    const nameLabelReset = screen.getAllByText("Name").find(el => el.closest('label'));
+    const checkboxReset = nameLabelReset?.closest('label')?.querySelector('input[type="checkbox"]');
+    if (checkboxReset) fireEvent.click(checkboxReset);
     expect(screen.queryByText("Alpha")).not.toBeInTheDocument();
 
     // Reset

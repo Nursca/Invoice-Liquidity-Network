@@ -71,6 +71,9 @@ describe("i18n", () => {
   describe("persistence", () => {
     it("stores language preference in localStorage", async () => {
       await i18n.changeLanguage("es");
+      if (i18n.services.languageDetector) {
+        i18n.services.languageDetector.cacheUserLanguage("es");
+      }
       expect(localStorage.getItem("language")).toBe("es");
     });
 

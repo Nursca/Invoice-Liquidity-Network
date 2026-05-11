@@ -52,20 +52,47 @@ vi.mock('next/navigation', () => ({
   useParams: vi.fn(() => ({})),
 }));
 
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString();
+    },
+    clear: () => {
+      store = {};
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (index: number) => Object.keys(store)[index] || null,
+  };
+})();
+
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+Object.defineProperty(global, 'localStorage', { value: localStorageMock });
+
 // Mock react 'use' hook for Next.js params
 vi.mock('react', async () => {
-  const actual = await vi.importActual('react');
+  const actual = await vi.importActual('react') as any;
   return {
     ...actual,
-    use: vi.fn((promise) => {
-      if (promise && typeof promise.then === 'function') {
-        // Simple mock for actual promises if needed
-        return promise; 
+    use: vi.fn((input) => {
+      if (input && typeof input.then === 'function') {
+        if (input._resolvedValue) return input._resolvedValue;
+        return input; 
       }
-      return promise; // For already resolved values/objects passed to use()
+      return input;
     }),
   };
 });
+
+// Initialize i18n
+import './src/i18n';
 
 // Mock global fetch
 global.fetch = vi.fn(() =>

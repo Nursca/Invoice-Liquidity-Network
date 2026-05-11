@@ -2,8 +2,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import NotificationSettings from "../../pages/settings/NotificationSettings";
 
 // Mock ToastContext
-jest.mock("../../context/ToastContext", () => ({
-  useToast: () => ({ addToast: jest.fn(), updateToast: jest.fn() }),
+vi.mock("../../context/ToastContext", () => ({
+  useToast: () => ({ addToast: vi.fn(), updateToast: vi.fn() }),
 }));
 
 describe("NotificationSettings (#70)", () => {

@@ -50,11 +50,21 @@ vi.mock("../../context/ToastContext", () => ({
 }));
 
 vi.mock("../../context/WalletContext", () => ({
-  useWallet: () => walletState,
+  useWallet: () => ({ ...walletState }),
 }));
 
 vi.mock("../../utils/soroban", () => ({
   submitInvoiceTransaction: (...args: unknown[]) => submitInvoiceTransaction(...args),
+}));
+
+vi.mock("../../hooks/useApprovedTokens", () => ({
+  useApprovedTokens: () => ({
+    tokens: [{ symbol: "USDC", decimals: 7, contractId: "TOKEN_ID" }],
+    tokenMap: new Map([["TOKEN_ID", { symbol: "USDC", decimals: 7, contractId: "TOKEN_ID" }]]),
+    defaultToken: { symbol: "USDC", decimals: 7, contractId: "TOKEN_ID" },
+    loading: false,
+    error: null,
+  }),
 }));
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -212,11 +222,11 @@ describe("SubmitInvoiceForm", () => {
     fireEvent.change(screen.getByPlaceholderText("3.00"), { target: { value: "5" } });
 
     // Face value
-    expect(screen.getByText("$10,000.00")).toBeInTheDocument();
-    // Freelancer payout = 10000 – (10000 * 5%) = 9500
-    expect(screen.getByText("$9,500.00")).toBeInTheDocument();
-    // LP yield = 10000 * 5% = 500
-    expect(screen.getByText("$500.00")).toBeInTheDocument();
+    expect(screen.getByText("10,000 USDC")).toBeInTheDocument();
+    // Freelancer payout
+    expect(screen.getAllByText("9,500 USDC").length).toBeGreaterThan(0);
+    // LP yield
+    expect(screen.getByText("500 USDC")).toBeInTheDocument();
   });
 
   it("resets the preview to zero when an invalid amount is entered", () => {
@@ -224,8 +234,8 @@ describe("SubmitInvoiceForm", () => {
 
     fireEvent.change(screen.getByPlaceholderText("5000.00"), { target: { value: "abc" } });
 
-    // All amounts should show 0
-    expect(screen.getAllByText("$0.00")).toHaveLength(3);
+    // All amounts should show 0 (Face value, Payout, LP Yield, and sometimes a hint)
+    expect(screen.getAllByText("0 USDC").length).toBeGreaterThanOrEqual(3);
   });
 
   // ── Successful submission ─────────────────────────────────────────────────

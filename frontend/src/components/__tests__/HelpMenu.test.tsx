@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 
 // Mock react-joyride so tests don't need full Joyride runtime
-jest.mock("react-joyride", () => ({
+vi.mock("react-joyride", () => ({
   __esModule: true,
   default: ({ run, callback }: { run: boolean; callback: (d: { status: string }) => void }) => {
     if (run) {

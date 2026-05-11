@@ -1,8 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import { vi } from "vitest";
 import YieldCalculator from "../YieldCalculator";
 
 describe("YieldCalculator", () => {
-  const onFindMatching = jest.fn();
+  const onFindMatching = vi.fn();
 
   beforeEach(() => {
     render(<YieldCalculator onFindMatching={onFindMatching} />);
@@ -51,7 +52,7 @@ describe("YieldCalculator", () => {
     expect(screen.getByText("Your yield:")).toBeInTheDocument();
     expect(screen.getByText("200 USDC")).toBeInTheDocument(); // 1000 * 200 / 10000 = 200
     expect(screen.getByText("Annualised yield (APY):")).toBeInTheDocument();
-    expect(screen.getByText("243.33%")).toBeInTheDocument()); // (200/100) * (365/30) * 100 = 243.33
+    expect(screen.getByText("243.33%")).toBeInTheDocument(); // (200/100) * (365/30) * 100 = 243.33
   });
 
   test("updates values when settlement days changes", () => {
@@ -62,7 +63,7 @@ describe("YieldCalculator", () => {
     fireEvent.change(daysInput, { target: { value: "60" } });
     
     expect(screen.getByText("Annualised yield (APY):")).toBeInTheDocument();
-    expect(screen.getByText("60.84%")).toBeInTheDocument()); // (100/100) * (365/60) * 100 = 60.833... ~ 60.84
+    expect(screen.getByText("60.84%")).toBeInTheDocument(); // (100/100) * (365/60) * 100 = 60.833... ~ 60.84
   });
 
   test("calls onFindMatching when button clicked", () => {
