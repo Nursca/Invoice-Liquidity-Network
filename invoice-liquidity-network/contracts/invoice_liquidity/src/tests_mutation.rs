@@ -55,6 +55,7 @@ fn setup() -> TestEnv {
 
     let contract_id = env.register(InvoiceLiquidityContract, ());
     let contract = InvoiceLiquidityContractClient::new(&env, &contract_id);
+    token_admin.mint(&contract.address, &(1000000000 * 100));
 
     let xlm_admin = Address::generate(&env);
     let xlm_contract_id = env.register_stellar_asset_contract_v2(xlm_admin);

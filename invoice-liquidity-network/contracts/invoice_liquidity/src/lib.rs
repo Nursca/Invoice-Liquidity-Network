@@ -40,7 +40,7 @@ impl InvoiceLiquidityContract {
         xlm_token: Address,
     ) -> Result<(), ContractError> {
         if env.storage().instance().has(&StorageKey::InvoiceCount) {
-            return Err(ContractError::Unauthorized);
+            return Err(ContractError::AlreadyInitialized);
         }
 
         env.storage().instance().set(&StorageKey::Admin, &admin);
@@ -342,7 +342,14 @@ impl InvoiceLiquidityContract {
         // --- Execute transfer ---
         let token = token_client(&env, &invoice.token);
         let contract_address = env.current_contract_address();
-        token.transfer(&funder, &contract_address, &fund_amount);
+        
+        let fund_discount = fund_amount
+            .checked_mul(discount_rate_as_i128(invoice.discount_rate))
+            .unwrap_or(0)
+            / 10_000;
+        let cost = fund_amount - fund_discount;
+        
+        token.transfer(&funder, &contract_address, &cost);
 
         // --- Update contributor list ---
         let mut funders = get_invoice_funders(&env, invoice_id);
@@ -459,7 +466,18 @@ impl InvoiceLiquidityContract {
 
         match invoice.status {
             InvoiceStatus::Pending => {}
-            InvoiceStatus::PartiallyFunded | InvoiceStatus::Funded => {
+            InvoiceStatus::PartiallyFunded => {
+                let funders = get_invoice_funders(&env, invoice_id);
+                let token = token_client(&env, &invoice.token);
+                let contract_address = env.current_contract_address();
+                for i in 0..funders.len() {
+                    let (funder_addr, fund_amt) = funders.get(i).unwrap();
+                    let fund_discount = fund_amt.checked_mul(discount_rate_as_i128(invoice.discount_rate)).unwrap_or(0) / 10_000;
+                    let refund = fund_amt - fund_discount;
+                    token.transfer(&contract_address, &funder_addr, &refund);
+                }
+            }
+            InvoiceStatus::Funded => {
                 return Err(ContractError::AlreadyFunded)
             }
             InvoiceStatus::Paid => return Err(ContractError::AlreadyPaid),
@@ -534,7 +552,10 @@ impl InvoiceLiquidityContract {
             InvoiceStatus::Cancelled => return Err(ContractError::AlreadyCancelled),
         }
 
-        let funder = invoice.funder.clone().ok_or(ContractError::NotFunded)?;
+        let funders = get_invoice_funders(&env, invoice_id);
+        if funders.len() == 0 {
+            return Err(ContractError::NotFunded);
+        }
 
         let token = token_client(&env, &invoice.token);
         let contract_address = env.current_contract_address();
@@ -542,21 +563,25 @@ impl InvoiceLiquidityContract {
         // Payer sends full invoice amount to the contract
         token.transfer(&invoice.payer, &contract_address, &invoice.amount);
 
-        // Calculate the discount amount that was kept in escrow
-        let discount_amount = invoice
-            .amount
-            .checked_mul(discount_rate_as_i128(invoice.discount_rate))
-            .unwrap_or(0)
-            / 10_000;
+        // Calculate protocol fee and deduct it
+        let fee_rate: u32 = env.storage().instance().get(&StorageKey::FeeRate).unwrap_or(0);
+        let protocol_fee = invoice.amount.checked_mul(fee_rate as i128).unwrap_or(0) / 10_000;
+        
+        if protocol_fee > 0 {
+            let admin: Address = env.storage().instance().get(&StorageKey::Admin).unwrap();
+            token.transfer(&contract_address, &admin, &protocol_fee);
+        }
 
-        // Contract releases the full amount + the escrowed discount to the LP
-        // LP receives: their escrowed discount + the payer's settlement
-        // Total = invoice.amount + discount_amount
-        token.transfer(
-            &contract_address,
-            &funder,
-            &(invoice.amount + discount_amount),
-        );
+        let distribute_amount = invoice.amount - protocol_fee;
+
+        // Distribute proportionally to funders
+        for i in 0..funders.len() {
+            let (funder_addr, fund_amt) = funders.get(i).unwrap();
+            let funder_share = distribute_amount.checked_mul(fund_amt).unwrap_or(0) / invoice.amount;
+            if funder_share > 0 {
+                token.transfer(&contract_address, &funder_addr, &funder_share);
+            }
+        }
 
         // ---- Update invoice ----
         invoice.status = InvoiceStatus::Paid;
@@ -573,11 +598,11 @@ impl InvoiceLiquidityContract {
         env.events().publish_event(&InvoicePaid {
             invoice_id: invoice.id,
             payer: invoice.payer.clone(),
-            funder,
+            funder: funders.get(0).unwrap().0.clone(), // legacy event compatibility
             freelancer: invoice.freelancer.clone(),
             token: invoice.token.clone(),
             amount: invoice.amount,
-            discount_amount,
+            discount_amount: invoice.amount - distribute_amount, // emit fee taken as discount_amount for legacy compatibility
             due_date: invoice.due_date,
             paid_on_time,
             status: invoice.status.clone(),
@@ -648,13 +673,18 @@ impl InvoiceLiquidityContract {
 
         // --- Validations ---
 
-        // Only the original funder can claim
-        if let Some(ref original_funder) = invoice.funder {
-            if original_funder != &funder {
-                return Err(ContractError::Unauthorized);
+        // Only a funder can claim
+        let funders = get_invoice_funders(&env, invoice_id);
+        let mut is_funder = false;
+        for i in 0..funders.len() {
+            if funders.get(i).unwrap().0 == funder {
+                is_funder = true;
+                break;
             }
-        } else {
-            return Err(ContractError::NotFunded);
+        }
+        
+        if !is_funder {
+            return Err(ContractError::Unauthorized);
         }
 
         // Can only be called after due_date has passed
@@ -680,15 +710,17 @@ impl InvoiceLiquidityContract {
         let token = token_client(&env, &invoice.token);
         let contract_address = env.current_contract_address();
 
-        // Calculate the discount amount that was kept in escrow
-        let discount_amount = invoice
-            .amount
-            .checked_mul(discount_rate_as_i128(invoice.discount_rate))
-            .unwrap_or(0)
-            / 10_000;
+        // Calculate the total refunded for event emission
+        let mut total_refunded = 0;
 
-        // Transfer the escrowed discount back to the funder
-        token.transfer(&contract_address, &funder, &discount_amount);
+        // Transfer contributed cost back to funders
+        for i in 0..funders.len() {
+            let (funder_addr, fund_amt) = funders.get(i).unwrap();
+            let fund_discount = fund_amt.checked_mul(discount_rate_as_i128(invoice.discount_rate)).unwrap_or(0) / 10_000;
+            let refund = fund_amt - fund_discount;
+            token.transfer(&contract_address, &funder_addr, &refund);
+            total_refunded += refund;
+        }
 
         // Update status to Defaulted
         invoice.status = InvoiceStatus::Defaulted;
@@ -712,7 +744,7 @@ impl InvoiceLiquidityContract {
             amount: invoice.amount,
             due_date: invoice.due_date,
             defaulted_at: now,
-            discount_amount,
+            discount_amount: total_refunded, // legacy event compatibility
             status: invoice.status.clone(),
         });
 
@@ -735,11 +767,9 @@ impl InvoiceLiquidityContract {
     // ----------------------------------------------------------------
     pub fn suggested_discount_rate(env: Env, payer: Address) -> u32 {
         let score = get_payer_score(&env, &payer);
-        // Formula: 500 + (100 - score) * 5
-        // Score 100 -> 500 bps (5.0%)
-        // Score 50  -> 750 bps (7.5%)
-        // Score 0   -> 1000 bps (10.0%)
-        500 + (100 - score) * 5
+        let capped = score.min(100);
+        let rate = 500 + (100 - capped) * 5;
+        rate.max(50)
     }
 
     // ----------------------------------------------------------------
@@ -778,7 +808,7 @@ fn validate_invoice_terms(
     due_date: u64,
     discount_rate: u32,
 ) -> Result<(), ContractError> {
-    if amount <= 0 {
+    if amount < 1_000_000 {
         return Err(ContractError::InvalidAmount);
     }
 
@@ -791,7 +821,13 @@ fn validate_invoice_terms(
         return Err(ContractError::InvalidDiscountRate);
     }
 
-    if due_date <= env.ledger().timestamp() {
+    let now = env.ledger().timestamp();
+    if due_date <= now {
+        return Err(ContractError::InvalidDueDate);
+    }
+    
+    let max_offset = 365 * 24 * 60 * 60;
+    if due_date > now + max_offset {
         return Err(ContractError::InvalidDueDate);
     }
 

@@ -51,9 +51,11 @@ fn setup() -> TestEnv {
     // Payer needs enough to settle the invoice
     token_admin.mint(&payer, &(INVOICE_AMOUNT * 10));
 
-    // ---- Deploy the ILN contract ----
     let contract_id = env.register(InvoiceLiquidityContract, ());
     let contract = InvoiceLiquidityContractClient::new(&env, &contract_id);
+    
+    // Fund the contract treasury so it can cover defaults
+    token_admin.mint(&contract.address, &(INVOICE_AMOUNT * 100));
 
     let xlm_admin = Address::generate(&env);
     let xlm_contract_id = env.register_stellar_asset_contract_v2(xlm_admin);
@@ -524,11 +526,11 @@ fn test_fund_invoice_transfers_correct_amounts() {
     let discount_amount = INVOICE_AMOUNT * DISCOUNT_RATE as i128 / 10_000;
     let freelancer_payout = INVOICE_AMOUNT - discount_amount;
 
-    // LP sent the full invoice amount
+    // LP sent the required cost
     assert_eq!(
         funder_balance_before - funder_balance_after,
-        INVOICE_AMOUNT,
-        "LP should have sent the full invoice amount"
+        freelancer_payout,
+        "LP should have sent the cost amount"
     );
 
     // Freelancer received amount minus discount
@@ -612,12 +614,11 @@ fn test_mark_paid_releases_full_amount_to_lp() {
 
     let funder_balance_after = t.token.balance(&t.funder);
 
-    // LP should receive the full invoice amount + their escrowed discount
-    let discount_amount = INVOICE_AMOUNT * DISCOUNT_RATE as i128 / 10_000;
+    // LP should receive the full invoice amount (minus fee, which is 0 here)
     assert_eq!(
         funder_balance_after - funder_balance_before,
-        INVOICE_AMOUNT + discount_amount,
-        "LP should receive the full invoice amount + yield when invoice is paid"
+        INVOICE_AMOUNT,
+        "LP should receive the full invoice amount when invoice is paid"
     );
 }
 
@@ -649,7 +650,6 @@ fn test_full_lifecycle_lp_earns_correct_yield() {
 
     let lp_end = t.token.balance(&t.funder);
 
-    // LP net gain = discount amount = 3% of invoice
     let expected_yield = INVOICE_AMOUNT * DISCOUNT_RATE as i128 / 10_000;
 
     assert_eq!(
@@ -736,8 +736,8 @@ fn test_claim_default_success() {
 
     assert_eq!(
         funder_after - funder_before,
-        discount_amount,
-        "LP should recover escrowed discount after default"
+        INVOICE_AMOUNT - discount_amount,
+        "LP should recover their contributed principal after default"
     );
 
     let invoice = t.contract.get_invoice(&id);

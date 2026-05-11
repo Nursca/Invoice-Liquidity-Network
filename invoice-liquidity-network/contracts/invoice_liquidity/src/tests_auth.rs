@@ -65,6 +65,14 @@ fn setup() -> AuthTestEnv {
     let contract_id = env.register(InvoiceLiquidityContract, ());
     let client = InvoiceLiquidityContractClient::new(&env, &contract_id);
 
+    mint_with_auth(
+        &env,
+        &token_address,
+        &token_admin_client,
+        &token_admin,
+        &client.address,
+    );
+
     let xlm_admin = Address::generate(&env);
     let xlm_contract = env.register_stellar_asset_contract_v2(xlm_admin);
     client.initialize(&token_admin, &token_address, &xlm_contract.address());
@@ -229,10 +237,11 @@ fn set_fund_invoice_auth(
     invoice_id: u64,
     include_transfer: bool,
 ) {
+    let cost = INVOICE_AMOUNT - (INVOICE_AMOUNT * DISCOUNT_RATE as i128 / 10000);
     let transfer_sub_invokes = [MockAuthInvoke {
         contract: &t.token_address,
         fn_name: "transfer",
-        args: (t.funder.clone(), t.contract_id.clone(), INVOICE_AMOUNT).into_val(&t.env),
+        args: (t.funder.clone(), t.contract_id.clone(), cost).into_val(&t.env),
         sub_invokes: &[],
     }];
 

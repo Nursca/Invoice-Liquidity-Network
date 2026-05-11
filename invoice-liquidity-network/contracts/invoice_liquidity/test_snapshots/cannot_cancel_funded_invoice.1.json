@@ -61,7 +61,7 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARQG5"
                 },
                 {
-                  "i128": "1000"
+                  "i128": "1000000"
                 },
                 {
                   "u64": "1000"
@@ -92,7 +92,7 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATYON"
                 },
                 {
-                  "i128": "1000"
+                  "i128": "1000000"
                 }
               ]
             }
@@ -117,7 +117,7 @@
                   "u64": "1"
                 },
                 {
-                  "i128": "1000"
+                  "i128": "1000000"
                 }
               ]
             }
@@ -136,7 +136,7 @@
                       "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2KM"
                     },
                     {
-                      "i128": "1000"
+                      "i128": "990000"
                     }
                   ]
                 }
@@ -320,7 +320,7 @@
                       "symbol": "amount"
                     },
                     "val": {
-                      "i128": "1000"
+                      "i128": "1000000"
                     }
                   },
                   {
@@ -328,7 +328,7 @@
                       "symbol": "amount_funded"
                     },
                     "val": {
-                      "i128": "1000"
+                      "i128": "1000000"
                     }
                   },
                   {
@@ -465,7 +465,7 @@
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATYON"
                       },
                       {
-                        "i128": "1000"
+                        "i128": "1000000"
                       }
                     ]
                   }
@@ -756,7 +756,7 @@
                       "symbol": "amount"
                     },
                     "val": {
-                      "i128": "10"
+                      "i128": "0"
                     }
                   },
                   {
@@ -808,7 +808,7 @@
                       "symbol": "amount"
                     },
                     "val": {
-                      "i128": "990"
+                      "i128": "990000"
                     }
                   },
                   {
@@ -860,7 +860,7 @@
                       "symbol": "amount"
                     },
                     "val": {
-                      "i128": "0"
+                      "i128": "10000"
                     }
                   },
                   {

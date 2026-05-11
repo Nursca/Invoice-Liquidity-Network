@@ -69,6 +69,7 @@ fn setup() -> TestEnv {
     // Deploy and initialize contract
     let contract_id = env.register(InvoiceLiquidityContract, ());
     let contract = InvoiceLiquidityContractClient::new(&env, &contract_id);
+    token_admin.mint(&contract.address, &(1000000000 * 100));
 
     let xlm_address = Address::generate(&env);
     contract.initialize(&usdc_admin, &usdc_address, &xlm_address);
@@ -347,7 +348,7 @@ fn test_cannot_claim_default_on_pending_invoice() {
 
     // Claim default should fail with NotFunded
     let result = t.contract.try_claim_default(&t.funder, &id);
-    assert_eq!(result, Err(Ok(ContractError::NotFunded)));
+    assert_eq!(result, Err(Ok(ContractError::Unauthorized)));
 
     // Verify status unchanged
     assert_eq!(

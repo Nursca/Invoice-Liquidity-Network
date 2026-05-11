@@ -18,4 +18,5 @@ pub enum ContractError {
     InvoiceExpired = 13,
     BatchTooLarge = 14,
     AlreadyCancelled = 15,
+    AlreadyInitialized = 16,
 }

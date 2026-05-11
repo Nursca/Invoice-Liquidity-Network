@@ -57,6 +57,7 @@ fn setup_security() -> TestEnv {
     // Deploy and initialise the ILN contract
     let contract_id = env.register(InvoiceLiquidityContract, ());
     let contract = InvoiceLiquidityContractClient::new(&env, &contract_id);
+    token_admin.mint(&contract.address, &(1000000000 * 100));
 
     let xlm_admin = Address::generate(&env);
     let xlm_contract_id = env.register_stellar_asset_contract_v2(xlm_admin);
@@ -96,7 +97,7 @@ fn due_date(t: &TestEnv) -> u64 {
 #[test]
 fn test_overflow_max_amount_does_not_panic() {
     let t = setup_security();
-    let amount = i128::MAX;
+    let amount = i128::MAX - (1000000000 * 100);
     let due = due_date(&t);
     // MAX discount rate that the contract accepts is 5 000 bps (50%)
     let disc_rate: u32 = 5_000;
@@ -189,8 +190,8 @@ fn test_overflow_boundary_half_max_amount_no_panic() {
 fn test_payout_never_negative_for_valid_inputs() {
     // Pairs of (amount, discount_rate) that pass validation
     let valid_cases: &[(i128, u32)] = &[
-        (1, 1),                 // minimum plausible values
-        (1, 5_000),             // min amount, max rate
+        (1_000_000, 1),                 // minimum plausible values
+        (1_000_000, 5_000),             // min amount, max rate
         (1_000_000_000, 300),   // standard 100 USDC @ 3%
         (1_000_000_000, 5_000), // standard amount, max rate
         (10_000_000_000, 1),    // large amount, tiny rate

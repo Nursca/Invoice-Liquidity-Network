@@ -2,6 +2,7 @@
 
 [![codecov](https://codecov.io/gh/Nursca/Invoice-Liquidity-Network/branch/main/graph/badge.svg)](https://codecov.io/gh/Nursca/Invoice-Liquidity-Network)
 [![CI](https://github.com/Nursca/Invoice-Liquidity-Network/actions/workflows/ci.yml/badge.svg)](https://github.com/Nursca/Invoice-Liquidity-Network/actions/workflows/ci.yml)
+[![E2E Nightly](https://github.com/Nursca/Invoice-Liquidity-Network/actions/workflows/e2e-nightly.yml/badge.svg)](https://github.com/Nursca/Invoice-Liquidity-Network/actions/workflows/e2e-nightly.yml)
 
 **Turn unpaid invoices into instant liquidity on-chain, on Stellar.**
 
@@ -81,7 +82,7 @@ ILN is built natively on Stellar for a reason:
 
 ## JavaScript/TypeScript SDK
 
-The repository now includes a typed SDK package at [sdk/README.md](/Users/mac/Desktop/Learning-folder/Invoice-Liquidity-Network/sdk/README.md) with browser Freighter signing support and Node.js keypair signing.
+The repository now includes a typed SDK package at [sdk/README.md](./sdk/README.md) with browser Freighter signing support and Node.js keypair signing.
 
 ```bash
 npm install @invoice-liquidity/sdk
@@ -172,15 +173,16 @@ BASE_URL=http://localhost:8080 k6 run tests/load/indexer.js
 ## Repository Structure
 
 ```
-invoice-liquidity-network/
-├── contracts/
-│   └── invoice_liquidity/
-│       ├── src/
-│       │   ├── lib.rs          # Main contract entry point
-│       │   ├── invoice.rs      # Invoice struct + storage
-│       │   ├── errors.rs       # Contract error types
-│       │   └── events.rs       # Contract events
-│       └── Cargo.toml
+.
+├── invoice-liquidity-network/
+│   └── contracts/
+│       └── invoice_liquidity/
+│           ├── src/
+│           │   ├── lib.rs          # Main contract entry point
+│           │   ├── invoice.rs      # Invoice struct + storage
+│           │   ├── errors.rs       # Contract error types
+│           │   └── events.rs       # Contract events
+│           └── Cargo.toml
 ├── tests/
 │   ├── submit_invoice_test.rs
 │   ├── fund_invoice_test.rs
@@ -190,7 +192,7 @@ invoice-liquidity-network/
 │   ├── risk-model.md           # Default handling + LP risk
 │   └── integration-guide.md   # How to integrate ILN
 ├── scripts/
-│   ├── deploy.sh               # Deploy to testnet/mainnet
+│   ├── deploy.ts               # Deploy to testnet/mainnet
 │   └── invoke.sh               # Helper scripts for contract calls
 ├── CONTRIBUTING.md
 ├── LICENSE
@@ -445,6 +447,8 @@ ILN is experimental software. Key risks to understand:
 
 **Oracle trust** — `mark_paid()` currently relies on the payer calling the contract directly, or a trusted oracle. A decentralized verification layer is on the roadmap.
 
+**Sybil risk on payer_score** — `payer_score` can currently be manipulated by users creating fake invoice cycles between their own wallets. v2 should use time-weighted or volume-weighted scoring to resist self-dealing.
+
 **No credit scoring (yet)** — All invoices are treated equally. Discount rates are set by the freelancer. LPs should assess payer quality manually for now.
 
 **Smart contract risk** — This contract has not been audited. Do not use on mainnet with real funds until a formal audit is completed.
@@ -454,6 +458,7 @@ ILN is experimental software. Key risks to understand:
 ## Governance
 
 The ILN protocol is governed by its community of token holders. To learn how governance works, how to earn voting power, and how to submit or vote on proposals, please read our [Governance Guide](./docs/governance.md).
+Note: The governance implementation (`iln_governance`) is currently a minimal skeleton. Full quorum and time-lock mechanisms are on the roadmap.
 
 ---
 

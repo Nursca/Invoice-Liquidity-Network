@@ -264,16 +264,16 @@ fn regression_fund_exact_amount_no_dust() {
     assert_eq!(invoice.amount_funded, ONE_USDC);
     assert_eq!(invoice.status, InvoiceStatus::Funded);
 
-    // Verify no dust left - funder should have paid exactly ONE_USDC
+    // Verify no dust left - funder should have paid exactly cost
     let funder_balance_after = t.token.balance(&t.funder);
-    let expected_balance = funder_balance_before - ONE_USDC;
+    let cost = ONE_USDC - 100_000;
+    let expected_balance = funder_balance_before - cost;
     assert_eq!(funder_balance_after, expected_balance);
 
-    // Verify contract retained exactly the discount amount
+    // Verify contract retained 0 because it paid out to freelancer
     let contract_address = t.contract.address.clone();
     let contract_balance = t.token.balance(&contract_address);
-    // 10_000_000 * 100 / 10000 = 100_000
-    assert_eq!(contract_balance, 100_000);
+    assert_eq!(contract_balance, 0);
 }
 
 /// Additional regression: Batch submissions also get unique IDs

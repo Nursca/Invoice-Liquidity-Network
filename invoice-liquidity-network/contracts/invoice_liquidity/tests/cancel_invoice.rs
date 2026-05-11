@@ -34,7 +34,7 @@ fn freelancer_can_cancel_pending() {
     let env = Env::default();
     let (client, token, freelancer, payer) = setup_test(&env);
 
-    let amount = 1000i128;
+    let amount = 1_000_000i128;
     let due_date = env.ledger().timestamp() + 1000;
     let discount = 100;
 
@@ -54,7 +54,7 @@ fn non_freelancer_cannot_cancel() {
     let _id = client.submit_invoice(
         &freelancer,
         &payer,
-        &1000,
+        &1_000_000,
         &(env.ledger().timestamp() + 1000),
         &100,
         &token,
@@ -73,7 +73,7 @@ fn cannot_cancel_funded_invoice() {
     let id = client.submit_invoice(
         &freelancer,
         &payer,
-        &1000,
+        &1_000_000,
         &(env.ledger().timestamp() + 1000),
         &100,
         &token,
@@ -81,9 +81,9 @@ fn cannot_cancel_funded_invoice() {
 
     // Mint tokens to funder
     let usdc_client = soroban_sdk::token::StellarAssetClient::new(&env, &token);
-    usdc_client.mint(&funder, &1000);
+    usdc_client.mint(&funder, &1_000_000);
 
-    client.fund_invoice(&funder, &id, &1000);
+    client.fund_invoice(&funder, &id, &1_000_000);
 
     let result = client.try_cancel_invoice(&id);
     assert_eq!(result, Err(Ok(ContractError::AlreadyFunded)));
@@ -97,7 +97,7 @@ fn cannot_cancel_cancelled_invoice() {
     let id = client.submit_invoice(
         &freelancer,
         &payer,
-        &1000,
+        &1_000_000,
         &(env.ledger().timestamp() + 1000),
         &100,
         &token,
