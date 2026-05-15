@@ -19,6 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
           
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -29,8 +30,8 @@ jobs:
         uses: taiki-e/install-action@cargo-llvm-cov
           
       - name: Run Rust Coverage
-        working-directory: invoice-liquidity-network
-        run: cargo llvm-cov --all-features --workspace --fail-under-lines 80 --lcov --output-path rust-lcov.info
+        working-directory: backend
+        run: cargo llvm-cov --all-features --workspace --fail-under-lines 80 --lcov --output-path ../rust-lcov.info
         
       - name: Install SDK Dependencies
         working-directory: sdk
@@ -38,12 +39,28 @@ jobs:
         
       - name: Run SDK Coverage
         working-directory: sdk
-        run: npm run test:coverage
+        run: npm run test:coverage -- --coverage.thresholds.lines=80
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Run Frontend Coverage
+        working-directory: frontend
+        run: npm run test -- --coverage --coverage.thresholds.lines=80
+
+      - name: Install Notifications Dependencies
+        working-directory: notifications
+        run: npm ci
+
+      - name: Run Notifications Coverage
+        working-directory: notifications
+        run: npm run test -- --coverage --coverage.thresholds.lines=80
         
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: invoice-liquidity-network/rust-lcov.info,sdk/coverage/lcov.info
-          fail_ci_if_error: false
+          files: rust-lcov.info,sdk/coverage/lcov.info,frontend/coverage/lcov.info,notifications/coverage/lcov.info
+          fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Nursca/Invoice-Liquidity-Network

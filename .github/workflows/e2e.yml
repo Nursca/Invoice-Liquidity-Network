@@ -5,14 +5,12 @@ on: [push, pull_request]
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
-    if: env.RUN_E2E == 'true'
-    env:
-      RUN_E2E: false
+    if: vars.RUN_E2E == 'true'
     steps:
       - uses: actions/checkout@v4
       
       - name: Start Local Stellar Node
-        run: docker-compose up -d
+        run: docker compose up -d
         
       - name: Setup Node
         uses: actions/setup-node@v4
