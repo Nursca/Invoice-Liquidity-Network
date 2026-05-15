@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useToast } from "../../context/ToastContext";
-import useAddressBook from "../../hooks/useAddressBook";
+import { useToast } from "@/context/ToastContext";
+import useAddressBook from "@/hooks/useAddressBook";
 
 interface AddressBookEntry {
   id: string;

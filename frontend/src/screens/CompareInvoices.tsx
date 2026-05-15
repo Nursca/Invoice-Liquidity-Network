@@ -2,15 +2,15 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useWallet } from "../../context/WalletContext";
-import { useToast } from "../../context/ToastContext";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-import { getAllInvoices, Invoice, getPayerScoresBatch, PayerScoreResult, fundInvoice, submitSignedTransaction } from "../../utils/soroban";
-import { formatAddress, formatDate, formatTokenAmount, calculateYield } from "../../utils/format";
-import { useApprovedTokens } from "../../hooks/useApprovedTokens";
-import { usePayerScores } from "../../hooks/usePayerScores";
-import RiskBadge from "../../components/RiskBadge";
+import { useWallet } from "@/context/WalletContext";
+import { useToast } from "@/context/ToastContext";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { getAllInvoices, Invoice, getPayerScoresBatch, PayerScoreResult, fundInvoice, submitSignedTransaction } from "@/utils/soroban";
+import { formatAddress, formatDate, formatTokenAmount, calculateYield } from "@/utils/format";
+import { useApprovedTokens } from "@/hooks/useApprovedTokens";
+import { usePayerScores } from "@/hooks/usePayerScores";
+import RiskBadge from "@/components/RiskBadge";
 
 export default function CompareInvoicesScreen() {
   const searchParams = useSearchParams();

@@ -2,15 +2,15 @@
 
 import { use, useEffect, useState, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { getInvoice, type Invoice } from "../../../utils/soroban";
-import { formatUsdcFromStroops, parseAmountToUnits, parseDiscountRateToBps, toUnixTimestamp } from "../../../utils/invoiceSubmission";
-import { TESTNET_USDC_TOKEN_ID, NETWORK_NAME, CONTRACT_ID } from "../../../constants";
-import ActivityFeed from "../../../components/ActivityFeed";
-import TopFundersWidget from "../../../components/TopFundersWidget";
-import { useWallet } from "../../../context/WalletContext";
-import { useToast } from "../../../context/ToastContext";
-import { useDocumentTitle } from "../../../hooks/useDocumentTitle";
-import { updateInvoice, submitSignedTransaction } from "../../../utils/soroban";
+import { getInvoice, type Invoice } from "@/utils/soroban";
+import { formatUsdcFromStroops, parseAmountToUnits, parseDiscountRateToBps, toUnixTimestamp } from "@/utils/invoiceSubmission";
+import { TESTNET_USDC_TOKEN_ID, NETWORK_NAME, CONTRACT_ID } from "@/constants";
+import ActivityFeed from "@/components/ActivityFeed";
+import TopFundersWidget from "@/components/TopFundersWidget";
+import { useWallet } from "@/context/WalletContext";
+import { useToast } from "@/context/ToastContext";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
+import { updateInvoice, submitSignedTransaction } from "@/utils/soroban";
 import "../../../styles/print.css";
 
 interface InvoiceEvent {

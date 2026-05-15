@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import { formatUSDC, calculateYield } from "../utils/format";
+import { formatUSDC, calculateYield } from "@/utils/format";
 
 interface YieldCalculatorProps {
   onFindMatching: (amount: bigint, discountRate: number) => void;
@@ -25,20 +25,20 @@ export default function YieldCalculator({ onFindMatching }: YieldCalculatorProps
 
   const handleFindMatching = useCallback(() => {
     onFindMatching(amountBigInt, discountRate);
-  }, [amountBigInt, discountRate]);
+  }, [amountBigInt, discountRate, onFindMatching]);
 
   return (
     <div className="border border-surface-dim rounded-xl overflow-hidden">
       <div className="flex items-center justify-between p-4 bg-surface-container-low cursor-pointer" onClick={() => setCollapsed(!collapsed)}>
         <h3 className="text-lg font-medium flex items-center gap-2">
           <span className="material-symbols-outlined">calculate</span>
-          What's my yield?
+          What&apos;s my yield?
         </h3>
         <span className="material-symbols-outlined transition-transform duration-200">
           {collapsed ? "expand_more" : "expand_less"}
         </span>
       </div>
-      
+
       {!collapsed && (
         <div className="p-6 space-y-4">
           <div className="space-y-2">
@@ -70,7 +70,7 @@ export default function YieldCalculator({ onFindMatching }: YieldCalculatorProps
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <label className="flex items-center justify-between text-sm font-medium text-on-surface-variant">
               Discount Rate (bps)
@@ -100,7 +100,7 @@ export default function YieldCalculator({ onFindMatching }: YieldCalculatorProps
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <label className="flex items-center justify-between text-sm font-medium text-on-surface-variant">
               Expected Settlement (days)
@@ -130,7 +130,7 @@ export default function YieldCalculator({ onFindMatching }: YieldCalculatorProps
               />
             </div>
           </div>
-          
+
           <div className="border-t border-surface-dim pt-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm font-medium">
@@ -153,7 +153,7 @@ export default function YieldCalculator({ onFindMatching }: YieldCalculatorProps
                 Compared to: ~5% savings account / ~8% typical DeFi
               </div>
             </div>
-            
+
             <button
               onClick={handleFindMatching}
               className="w-full mt-4 bg-primary text-surface-container-lowest text-xs font-bold py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors"

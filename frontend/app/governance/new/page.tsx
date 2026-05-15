@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Footer from "../../../components/Footer";
-import Navbar from "../../../components/Navbar";
-import { useToast } from "../../../context/ToastContext";
-import { useWallet } from "../../../context/WalletContext";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import { useToast } from "@/context/ToastContext";
+import { useWallet } from "@/context/WalletContext";
 import {
     AcceptedToken,
     CreateProposalFormType,
@@ -18,7 +18,7 @@ import {
     getVotingPower,
     isValidStellarAddress,
     lookupToken,
-} from "../../../utils/governance";
+} from "@/utils/governance";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 

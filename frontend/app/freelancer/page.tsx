@@ -2,29 +2,29 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef, Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-import InvoiceFilterBar from "../../components/InvoiceFilterBar";
-import { useWallet } from "../../context/WalletContext";
-import { useToast } from "../../context/ToastContext";
-import { useApprovedTokens } from "../../hooks/useApprovedTokens";
-import { applyInvoiceFilters, useInvoiceFilters } from "../../hooks/useInvoiceFilters";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import InvoiceFilterBar from "@/components/InvoiceFilterBar";
+import { useWallet } from "@/context/WalletContext";
+import { useToast } from "@/context/ToastContext";
+import { useApprovedTokens } from "@/hooks/useApprovedTokens";
+import { applyInvoiceFilters, useInvoiceFilters } from "@/hooks/useInvoiceFilters";
 import {
   getAllInvoices,
   submitInvoice,
   Invoice,
-} from "../../utils/soroban";
+} from "@/utils/soroban";
 import {
   formatUSDC,
   formatAddress,
   formatDate,
-} from "../../utils/format";
+} from "@/utils/format";
 import { rpc, TransactionBuilder } from "@stellar/stellar-sdk";
-import { RPC_URL, NETWORK_PASSPHRASE } from "../../constants";
-import SkeletonRow, { FREELANCER_COLUMNS } from "../../components/SkeletonRow";
-import { ExportButton } from "../../components/ExportButton";
-import { EmptyState } from "../../components/EmptyState";
-import { FreelancerEmptyIllustration } from "../../components/illustrations/EmptyIllustrations";
+import { RPC_URL, NETWORK_PASSPHRASE } from "@/constants";
+import SkeletonRow, { FREELANCER_COLUMNS } from "@/components/SkeletonRow";
+import { ExportButton } from "@/components/ExportButton";
+import { EmptyState } from "@/components/EmptyState";
+import { FreelancerEmptyIllustration } from "@/components/illustrations/EmptyIllustrations";
 
 const server = new rpc.Server(RPC_URL);
 

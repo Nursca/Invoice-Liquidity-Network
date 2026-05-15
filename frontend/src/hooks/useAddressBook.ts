@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useWallet } from "../../context/WalletContext";
+import { useWallet } from "@/context/WalletContext";
 
 interface AddressBookEntry {
   id: string;

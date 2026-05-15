@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import React, { Suspense } from "react";
 import "./globals.css";
-import { ToastProvider } from "../context/ToastContext";
-import { WalletProvider } from "../context/WalletContext";
-import { NotificationProvider } from "../context/NotificationContext";
-import OnboardingFlow from "../components/onboarding/OnboardingFlow";
-import NetworkBanner from "../components/NetworkBanner";
-import FABProvider from "../components/FABProvider";
-import CommandPalette from "../components/CommandPalette";
+import { ToastProvider } from "@/context/ToastContext";
+import { WalletProvider } from "@/context/WalletContext";
+import { NotificationProvider } from "@/context/NotificationContext";
+import OnboardingFlow from "@/components/onboarding/OnboardingFlow";
+import NetworkBanner from "@/components/NetworkBanner";
+import FABProvider from "@/components/FABProvider";
+import CommandPalette from "@/components/CommandPalette";
 import Providers from "./Providers";
 
 
@@ -53,6 +53,7 @@ export default function RootLayout({
           <ToastProvider>
             <WalletProvider>
               <NotificationProvider>
+                <FABProvider />
                 <div className="min-h-screen flex flex-col">
                   <NetworkBanner />
                   <div className="flex-1">
@@ -64,12 +65,12 @@ export default function RootLayout({
                 <Suspense fallback={null}>
                   <OnboardingFlow />
                 </Suspense>
+                <Suspense fallback={null}>
+                  <CommandPalette />
+                </Suspense>
               </NotificationProvider>
             </WalletProvider>
           </ToastProvider>
-          <Suspense fallback={null}>
-            <CommandPalette />
-          </Suspense>
         </Providers>
       </body>
     </html>

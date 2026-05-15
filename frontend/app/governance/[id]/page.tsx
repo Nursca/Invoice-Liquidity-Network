@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import Footer from "../../../components/Footer";
-import Navbar from "../../../components/Navbar";
-import VoteProgressBar from "../../../components/VoteProgressBar";
-import { useToast } from "../../../context/ToastContext";
-import { useWallet } from "../../../context/WalletContext";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import VoteProgressBar from "@/components/VoteProgressBar";
+import { useToast } from "@/context/ToastContext";
+import { useWallet } from "@/context/WalletContext";
 import {
     Proposal,
     ProposalStatus,
@@ -20,7 +20,7 @@ import {
     quorumReached,
     timeRemaining,
     totalVotes,
-} from "../../../utils/governance";
+} from "@/utils/governance";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 

@@ -19,14 +19,14 @@
 
 import { useEffect, useState, useCallback, useRef } from "react";
 import type { Metadata } from "next";
-import { NETWORK_NAME } from "../../constants";
-import { getAllInvoices, Invoice } from "../../utils/soroban";
-import AmountHistogram from "../../components/charts/AmountHistogram";
-import FundingChart from "../../components/charts/FundingChart";
-import DefaultRateChart from "../../components/charts/DefaultRateChart";
-import { ExportButton } from "../../components/ExportButton";
-import AnimatedNumber from "../../components/AnimatedNumber";
-import { useDocumentTitle } from "../../hooks/useDocumentTitle";
+import { NETWORK_NAME } from "@/constants";
+import { getAllInvoices, Invoice } from "@/utils/soroban";
+import AmountHistogram from "@/components/charts/AmountHistogram";
+import FundingChart from "@/components/charts/FundingChart";
+import DefaultRateChart from "@/components/charts/DefaultRateChart";
+import { ExportButton } from "@/components/ExportButton";
+import AnimatedNumber from "@/components/AnimatedNumber";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 // ─── Metadata (static export — works for server components; kept here for
 //     documentation purposes since this is a "use client" file) ───────────────

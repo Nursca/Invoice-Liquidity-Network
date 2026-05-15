@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import CompareInvoicesScreen from "@/src/screens/CompareInvoices";
+import CompareInvoicesScreen from "@/screens/CompareInvoices";
 
 export default function ComparePage() {
   return (

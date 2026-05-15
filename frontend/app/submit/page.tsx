@@ -1,8 +1,8 @@
 "use client";
 
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-import SubmitInvoiceForm from "../../components/SubmitInvoiceForm";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SubmitInvoiceForm from "@/components/SubmitInvoiceForm";
 
 export default function SubmitRoute() {
   return (

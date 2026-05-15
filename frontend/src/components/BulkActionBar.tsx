@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Invoice, cancelInvoice, submitSignedTransaction } from "../../utils/soroban";
-import { useWallet } from "../../context/WalletContext";
-import { useToast } from "../../context/ToastContext";
+import { Invoice, cancelInvoice, submitSignedTransaction } from "@/utils/soroban";
+import { useWallet } from "@/context/WalletContext";
+import { useToast } from "@/context/ToastContext";
 
 interface BulkActionBarProps {
   selectedInvoices: Invoice[];

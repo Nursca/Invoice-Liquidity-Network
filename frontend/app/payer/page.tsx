@@ -3,19 +3,19 @@
 import { rpc, TransactionBuilder } from "@stellar/stellar-sdk";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState, Suspense } from "react";
-import InvoiceFilterBar from "../../components/InvoiceFilterBar";
-import Footer from "../../components/Footer";
-import Navbar from "../../components/Navbar";
-import DueDateCountdown from "../../components/DueDateCountdown";
-import { RPC_URL } from "../../constants";
-import { useToast } from "../../context/ToastContext";
-import { useWallet } from "../../context/WalletContext";
-import { useApprovedTokens } from "../../hooks/useApprovedTokens";
-import { applyInvoiceFilters, useInvoiceFilters } from "../../hooks/useInvoiceFilters";
-import { formatAddress, formatDate, formatTokenAmount } from "../../utils/format";
-import { getAllInvoices, Invoice, markPaid } from "../../utils/soroban";
-import TokenSelector, { TokenAmount } from "../../components/TokenSelector";
-import InvoiceTable, { ColumnDefinition } from "../../components/InvoiceTable";
+import InvoiceFilterBar from "@/components/InvoiceFilterBar";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import DueDateCountdown from "@/components/DueDateCountdown";
+import { RPC_URL } from "@/constants";
+import { useToast } from "@/context/ToastContext";
+import { useWallet } from "@/context/WalletContext";
+import { useApprovedTokens } from "@/hooks/useApprovedTokens";
+import { applyInvoiceFilters, useInvoiceFilters } from "@/hooks/useInvoiceFilters";
+import { formatAddress, formatDate, formatTokenAmount } from "@/utils/format";
+import { getAllInvoices, Invoice, markPaid } from "@/utils/soroban";
+import TokenSelector, { TokenAmount } from "@/components/TokenSelector";
+import InvoiceTable, { ColumnDefinition } from "@/components/InvoiceTable";
 
 const server = new rpc.Server(RPC_URL);
 

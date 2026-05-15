@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { Invoice } from "../utils/soroban";
+import type { Invoice } from "@/utils/soroban";
 
 export const INVOICE_STATUSES = ["Pending", "Funded", "Paid", "Defaulted", "Cancelled"] as const;
 export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];

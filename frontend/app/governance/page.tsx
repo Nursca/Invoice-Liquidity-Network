@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import Footer from "../../components/Footer";
-import Navbar from "../../components/Navbar";
-import VoteProgressBar from "../../components/VoteProgressBar";
-import { useDocumentTitle } from "../../hooks/useDocumentTitle";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import VoteProgressBar from "@/components/VoteProgressBar";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 import {
     Proposal,
     ProposalStatus,
     fetchProposals,
     timeRemaining,
     totalVotes,
-} from "../../utils/governance";
+} from "@/utils/governance";
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
 

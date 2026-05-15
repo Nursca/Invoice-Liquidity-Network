@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import NotificationSettings from "../../screens/settings/NotificationSettings";
+import NotificationSettings from "@/screens/settings/NotificationSettings";
 
 // Mock ToastContext
 vi.mock("../../context/ToastContext", () => ({

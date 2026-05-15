@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { TESTNET_USDC_TOKEN_ID } from "../constants";
-import { getApprovedTokenIds, getTokenMetadata, type TokenMetadata } from "../utils/soroban";
+import { TESTNET_USDC_TOKEN_ID } from "@/constants";
+import { getApprovedTokenIds, getTokenMetadata, type TokenMetadata } from "@/utils/soroban";
 
 export interface ApprovedToken extends TokenMetadata {
   iconLabel: string;

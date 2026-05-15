@@ -1,10 +1,10 @@
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DashboardPage from '../Dashboard';
-import * as soroban from '../../../utils/soroban';
-import { useWallet } from '../../../context/WalletContext';
-import { useToast } from '../../../context/ToastContext';
-import { useInvoices } from '../../../hooks/useInvoices';
+import * as soroban from '@/utils/soroban';
+import { useWallet } from '@/context/WalletContext';
+import { useToast } from '@/context/ToastContext';
+import { useInvoices } from '@/hooks/useInvoices';
 
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 

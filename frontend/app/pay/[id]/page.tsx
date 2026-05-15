@@ -1,12 +1,12 @@
 "use client";
 
 import { use, useEffect, useState, useCallback } from "react";
-import { getInvoice, markPaid, submitSignedTransaction, type Invoice } from "../../../utils/soroban";
-import { formatUsdcFromStroops } from "../../../utils/invoiceSubmission";
-import { useWallet } from "../../../context/WalletContext";
-import { useToast } from "../../../context/ToastContext";
-import { TESTNET_USDC_TOKEN_ID, NETWORK_NAME } from "../../../constants";
-import ActivityFeed from "../../../components/ActivityFeed";
+import { getInvoice, markPaid, submitSignedTransaction, type Invoice } from "@/utils/soroban";
+import { formatUsdcFromStroops } from "@/utils/invoiceSubmission";
+import { useWallet } from "@/context/WalletContext";
+import { useToast } from "@/context/ToastContext";
+import { TESTNET_USDC_TOKEN_ID, NETWORK_NAME } from "@/constants";
+import ActivityFeed from "@/components/ActivityFeed";
 
 type LoadState = "loading" | "success" | "error";
 

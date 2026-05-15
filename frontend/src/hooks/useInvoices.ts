@@ -1,9 +1,9 @@
 "use client";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getAllInvoices, getInvoice, fundInvoice, submitSignedTransaction, Invoice } from "../utils/soroban";
-import { useWallet } from "../context/WalletContext";
-import { useToast } from "../context/ToastContext";
+import { getAllInvoices, getInvoice, fundInvoice, submitSignedTransaction, Invoice } from "@/utils/soroban";
+import { useWallet } from "@/context/WalletContext";
+import { useToast } from "@/context/ToastContext";
 
 const TERMINAL_STATUSES = ["Paid", "Defaulted", "Cancelled"];
 

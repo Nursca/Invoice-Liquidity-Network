@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { Invoice, PayerScoreResult, getPayerScoresBatch } from "../utils/soroban";
-import { scoreToRiskLevel, RiskLevel } from "../utils/risk";
+import { Invoice, PayerScoreResult, getPayerScoresBatch } from "@/utils/soroban";
+import { scoreToRiskLevel, RiskLevel } from "@/utils/risk";
 
 export interface PayerRiskMap {
   scores: Map<string, PayerScoreResult | null>;
